@@ -12,8 +12,6 @@ import yt_dlp
 
 BRAND_GREEN = discord.Colour.from_rgb(46, 204, 113)
 
-# Optional: path to a cookies.txt file for yt-dlp (some YouTube requests may require it)
-# Set on your host as an environment variable: YTDLP_COOKIES=/path/to/cookies.txt
 # Optional: path to a browser-exported cookies.txt (Netscape format).
 # Set this as an environment variable (Coolify / Docker env):
 #   YTDLP_COOKIES=/app/data/cookies.txt
@@ -21,22 +19,23 @@ BRAND_GREEN = discord.Colour.from_rgb(46, 204, 113)
 # can take effect after a restart/redeploy.
 BASE_YTDL_OPTS = {
     "format": "bestaudio/best",
-    "noplaylist": False,
+    "noplaylist": True,
     "quiet": True,
     "extract_flat": False,
+
+    # Prefer IPv4 on some VPS networks (also helps with some CDNs)
     "source_address": "0.0.0.0",
+
+    # More resilient defaults
+    "nocheckcertificate": True,
+    "retries": 3,
+    "fragment_retries": 3,
+    "socket_timeout": 20,
 }
-
-# Default: YouTube search
-YTDL_OPTS_YT = dict(BASE_YTDL_OPTS)
-YTDL_OPTS_YT["default_search"] = "ytsearch"
-
-# Optional: SoundCloud search (use prefix sc: in /music play)
-YTDL_OPTS_SC = dict(BASE_YTDL_OPTS)
-YTDL_OPTS_SC["default_search"] = "scsearch"
 
 FFMPEG_BEFORE_OPTS = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
 FFMPEG_OPTS = "-vn"
+
 
 def find_ffmpeg_exe() -> str:
     # 1) env override
@@ -53,6 +52,7 @@ def find_ffmpeg_exe() -> str:
     p = shutil.which("ffmpeg")
     return p or "ffmpeg"
 
+
 @dataclass
 class Track:
     title: str
@@ -60,6 +60,7 @@ class Track:
     webpage_url: str
     duration: Optional[int] = None
     requester_id: Optional[int] = None
+
 
 class GuildPlayer:
     def __init__(self):
@@ -69,6 +70,7 @@ class GuildPlayer:
         self.loop: bool = False
         self._task: Optional[asyncio.Task] = None
         self._lock = asyncio.Lock()
+
 
 class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -153,9 +155,21 @@ class Music(commands.Cog):
         def run():
             # Build options per-call so env changes take effect after a restart/redeploy
             opts = dict(BASE_YTDL_OPTS)
+
             cookiefile = os.getenv("YTDLP_COOKIES")
             if cookiefile:
                 opts["cookiefile"] = cookiefile
+
+            # IMPORTANT: YouTube bot-check mitigations
+            # Force more reliable player clients. This often helps when web requests get bot-checked.
+            opts["extractor_args"] = {
+                "youtube": {
+                    "player_client": ["ios", "web", "tv"],
+                }
+            }
+
+            # Debug line so you can SEE it in Coolify logs
+            print(f"[music] yt-dlp cookiefile={cookiefile} exists={bool(cookiefile and os.path.exists(cookiefile))} q={q_run}")
 
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(q_run, download=False)
@@ -167,7 +181,7 @@ class Music(commands.Cog):
                         raise RuntimeError("No results.")
                     info = entries[0]
 
-                # Some providers (notably SoundCloud search) can return a URL-type entry that needs a 2nd pass
+                # Some providers can return a URL-type entry that needs a 2nd pass
                 if isinstance(info, dict) and info.get("_type") in ("url", "url_transparent"):
                     u = info.get("url") or info.get("webpage_url")
                     if u:
@@ -223,7 +237,9 @@ class Music(commands.Cog):
                 vc = guild.voice_client
                 if vc and vc.is_connected() and (not vc.is_playing()) and (not vc.is_paused()):
                     try:
-                        await text_channel.send(embed=self._embed("👋 Leaving voice", "I left the voice channel due to **3 minutes of inactivity**."))
+                        await text_channel.send(
+                            embed=self._embed("👋 Leaving voice", "I left the voice channel due to **3 minutes of inactivity**.")
+                        )
                     except Exception:
                         pass
                     try:
@@ -261,7 +277,12 @@ class Music(commands.Cog):
                 continue
 
             try:
-                await text_channel.send(embed=self._embed("🎶 Now playing", f"[{track.title}]({track.webpage_url})  •  `{self._format_duration(track.duration)}`"))
+                await text_channel.send(
+                    embed=self._embed(
+                        "🎶 Now playing",
+                        f"[{track.title}]({track.webpage_url})  •  `{self._format_duration(track.duration)}`",
+                    )
+                )
             except Exception:
                 pass
 
@@ -270,9 +291,6 @@ class Music(commands.Cog):
             # If loop is off, advance naturally
             if not player.loop:
                 player.current = None
-
-    # Auto-leave when everyone leaves the voice channel (after 3 minutes)
-    # (disabled) voice empty auto-leave listener: hosting voice can flap; keep stable.
 
     # --------- slash commands ----------
     music = app_commands.Group(name="music", description="Music commands (verified users).")
@@ -298,9 +316,11 @@ class Music(commands.Cog):
         except Exception as e:
             msg = str(e)
             if "Sign in to confirm you" in msg:
-                msg = ("YouTube blocked the request (bot-check). "
-                       "Try `/music play sc:artist song`, a SoundCloud URL, a direct stream URL, "
-                       "or set YTDLP_COOKIES on the host to a cookies.txt file.")
+                msg = (
+                    "YouTube blocked the request (bot-check). "
+                    "Make sure YTDLP_COOKIES points to a browser-exported cookies.txt file. "
+                    "Then restart/redeploy the bot."
+                )
             return await interaction.followup.send(f"Couldn’t load that track. ({msg})", ephemeral=True)
 
         # Now join voice
@@ -401,7 +421,10 @@ class Music(commands.Cog):
         if not player.current:
             return await interaction.response.send_message("Nothing is playing.", ephemeral=True)
         t = player.current
-        await interaction.response.send_message(embed=self._embed("🎶 Now playing", f"[{t.title}]({t.webpage_url})  •  `{self._format_duration(t.duration)}`"), ephemeral=True)
+        await interaction.response.send_message(
+            embed=self._embed("🎶 Now playing", f"[{t.title}]({t.webpage_url})  •  `{self._format_duration(t.duration)}`"),
+            ephemeral=True,
+        )
 
     @music.command(name="volume", description="Set volume (0-100).")
     async def volume(self, interaction: discord.Interaction, percent: app_commands.Range[int, 0, 100]):
@@ -430,6 +453,7 @@ class Music(commands.Cog):
             return await interaction.response.send_message("I’m not connected.", ephemeral=True)
         await vc.disconnect()
         await interaction.response.send_message("👋 Disconnected.", ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Music(bot))
