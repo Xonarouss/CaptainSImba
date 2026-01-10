@@ -164,9 +164,13 @@ class Music(commands.Cog):
             # Force more reliable player clients. This often helps when web requests get bot-checked.
             opts["extractor_args"] = {
                 "youtube": {
-                    "player_client": ["ios", "web", "tv"],
+                    "player_client": ["web", "tv"],
                 }
             }
+
+            # Better format fallback (some contexts expose only certain streams)
+            opts["format"] = "bestaudio/best"
+            opts["format_sort"] = ["acodec:opus", "abr", "asr", "ext"]
 
             # Debug line so you can SEE it in Coolify logs
             print(f"[music] yt-dlp cookiefile={cookiefile} exists={bool(cookiefile and os.path.exists(cookiefile))} q={q_run}")
