@@ -6,10 +6,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY CaptainSIMBA/requirements.txt /app/requirements.txt
+# requirements file is in repo root
+COPY requirements /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY CaptainSIMBA/ /app/
+# copy the whole repo into /app
+COPY . /app/
 
 ENV PYTHONUNBUFFERED=1
 
