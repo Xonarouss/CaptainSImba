@@ -1,0 +1,4 @@
+.env
+cookies.txt
+data/*.db
+__pycache__/
