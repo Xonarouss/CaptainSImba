@@ -1,0 +1,266 @@
+brand:
+  name: XonarousLIVE
+rebuild:
+  keep_rules_channel_name: rules
+  information_category_name: ℹ️ INFORMATION
+channels:
+  welcome_channel_name: welcome
+  announcements_channel_name: announcements
+  live_channel_name: live-now
+  mod_log_channel_name: mod-log
+  role_select_channel_name: role-select
+welcome:
+  enabled: true
+  message: 👋 Welcome {member_mention} to **XonarousLIVE**! Please read {rules_channel_mention}
+    and say hi in {general_channel_mention}.
+status_rotation:
+  enabled: true
+  interval_seconds: 15
+  custom_statuses:
+  - Annoying Xonarous
+  - Sitting on Xonarous's lap
+  - Cleared for takeoff ✈️
+  - Holding short runway 18R
+  aviation_facts:
+  - A standard ILS has a localizer for lateral guidance and a glide slope for vertical
+    guidance.
+  - Contrails form when hot, humid exhaust mixes with cold air and creates ice crystals.
+  - The 'black box' in aircraft is usually bright orange to be easier to find after
+    an accident.
+  - 'Pilots often brief an approach using: runway, minima, missed approach, threats,
+    and taxi plan.'
+leveling:
+  enabled: true
+  xp_per_message: 10
+  cooldown_seconds: 60
+  reward_roles:
+  - level: 5
+    role_name: Level 5
+  - level: 10
+    role_name: Level 10
+  - level: 20
+    role_name: Level 20
+automod:
+  enabled: true
+  max_mentions: 6
+  max_caps_ratio: 0.75
+  min_caps_length: 12
+  block_invite_links: true
+  spam_window_seconds: 8
+  spam_max_messages: 6
+  action_timeout_minutes: 10
+giveaways:
+  enabled: true
+role_select:
+  enabled: true
+  platforms:
+  - PlayStation
+  - Xbox
+  - Windows
+  - Linux
+  - iOS
+  - Android
+  regions:
+  - Africa
+  - Europe
+  - Asia
+  - North America
+  - South America
+  - Oceania
+  languages_top10:
+  - English
+  - Mandarin Chinese
+  - Hindi
+  - Spanish
+  - French
+  - Arabic
+  - Bengali
+  - Portuguese
+  - Russian
+  - Dutch
+roles:
+- name: XonarousLIVE | Owner
+  color:
+  - 255
+  - 215
+  - 0
+  perms:
+    administrator: true
+- name: Discord Moderator
+  color:
+  - 80
+  - 160
+  - 255
+  perms:
+    manage_messages: true
+    moderate_members: true
+    manage_channels: true
+    manage_roles: true
+    view_audit_log: true
+    kick_members: true
+    ban_members: true
+- name: Twitch Moderator
+  color:
+  - 150
+  - 90
+  - 255
+  perms: {}
+- name: BromeoLIVE
+  color:
+  - 255
+  - 105
+  - 180
+  perms:
+    administrator: true
+- name: Twitch Subscriber T3
+  color:
+  - 255
+  - 80
+  - 80
+  perms: {}
+- name: Twitch Subscriber T2
+  color:
+  - 255
+  - 140
+  - 80
+  perms: {}
+- name: Twitch Subscriber T1
+  color:
+  - 255
+  - 200
+  - 80
+  perms: {}
+- name: Twitch Follower
+  color:
+  - 120
+  - 255
+  - 160
+  perms: {}
+- name: Community
+  color:
+  - 180
+  - 180
+  - 180
+  perms:
+    send_messages: true
+    read_message_history: true
+    view_channel: true
+- name: Discord Admin
+  color:
+  - 255
+  - 80
+  - 80
+  perms:
+    administrator: true
+structure:
+- category: ℹ️ INFORMATION
+  channels:
+  - name: announcements
+    type: text
+  - name: rules
+    type: text
+  - name: info
+    type: text
+  - name: faq
+    type: text
+  - name: welcome
+    type: text
+  - name: live-now
+    type: text
+  - name: socials
+    type: text
+  - name: role-select
+    type: text
+- category: 🌍 GENERAL
+  channels:
+  - name: general-chat
+    type: text
+  - name: stream-chat
+    type: text
+  - name: introductions
+    type: text
+  - name: suggestions
+    type: text
+  - name: polls
+    type: text
+  - name: clips-and-highlights
+    type: text
+  - name: screenshots
+    type: text
+  - name: memes
+    type: text
+  - name: off-topic
+    type: text
+- category: 🇳🇱 NEDERLANDS
+  gated_by_language: Dutch
+  channels:
+  - name: nl-algemeen
+    type: text
+  - name: nl-stream-chat
+    type: text
+  - name: nl-gaming
+    type: text
+  - name: nl-flight-sim
+    type: text
+  - name: nl-minecraft
+    type: text
+  - name: nl-off-topic
+    type: text
+- category: 🎮 GAMING
+  channels:
+  - name: fortnite
+    type: text
+  - name: minecraft
+    type: text
+  - name: pvp-games
+    type: text
+  - name: other-games
+    type: text
+- category: ✈️ FLIGHT SIM
+  channels:
+  - name: flight-simulation
+    type: text
+  - name: msfs
+    type: text
+  - name: vatsim
+    type: text
+  - name: aviation
+    type: text
+- category: 🤖 BOT STUFF
+  channels:
+  - name: bot-commands
+    type: text
+  - name: ai-chat
+    type: text
+  - name: aviation-tools
+    type: text
+  - name: weather
+    type: text
+- category: 🛡️ MODERATION
+  private_to_mods: true
+  channels:
+  - name: mod-log
+    type: text
+  - name: mod-notes
+    type: text
+  - name: staff-chat
+    type: text
+- category: 🔊 VOICE
+  channels:
+  - name: General
+    type: voice
+  - name: Stream Hangout
+    type: voice
+  - name: Gaming VC
+    type: voice
+  - name: Aviation VC
+    type: voice
+  - name: AFK
+    type: voice
+verification:
+  enabled: true
+  unverified_role: Unverified/Niet Geverifieerd
+  verified_role: Xonar Squad
+  verify_emoji: ✅
+  rules_channel_name: rules
+  dm_enabled: true

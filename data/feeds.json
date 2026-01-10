@@ -1,0 +1,25 @@
+{
+  "feeds": [
+    {
+      "name": "youtube",
+      "url": "https://www.youtube.com/@xonarous"
+    },
+    {
+      "name": "twitch",
+      "url": "https://twitchrss.com/feeds/?username=xonarouslive&feed=streams"
+    },
+    {
+      "name": "tiktok",
+      "url": "https://rss.app/feeds/s5OW7gDkBfYwzBJ1.xml"
+    },
+    {
+      "name": "instagram",
+      "url": "https://rss.app/feeds/ars3x3e7nKX6ATSb.xml"
+    },
+    {
+      "name": "x",
+      "url": "https://rss.app/feeds/4W0lQm2W2jfCMLla.xml"
+    }
+  ],
+  "last_seen": {}
+}
