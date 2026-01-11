@@ -16,5 +16,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY . /app
 
 ENV PYTHONUNBUFFERED=1
-CMD ["python", "main.py"]
+CMD ["python", "bot.py"]
+
 
