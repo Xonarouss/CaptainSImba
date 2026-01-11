@@ -168,6 +168,13 @@ class Music(commands.Cog):
                 }
             }
 
+
+            # EJS / JS challenge solver (required for YouTube in newer yt-dlp)
+            # Needs a JS runtime in the container (recommended: Deno) AND either yt-dlp[default] (yt-dlp-ejs)
+            # or remote EJS components enabled.
+            opts["js_runtimes"] = ["deno"]
+            opts["remote_components"] = ["ejs:github"]
+
             # Better format fallback (some contexts expose only certain streams)
             opts["format"] = "bestaudio/best"
             opts["format_sort"] = ["acodec:opus", "abr", "asr", "ext"]
